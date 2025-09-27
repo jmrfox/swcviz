@@ -1,10 +1,5 @@
-import sys
-
 from pathlib import Path
-
-sys.path.append("..")
 import pytest
-
 from swcviz import parse_swc, SWCParseResult
 
 
