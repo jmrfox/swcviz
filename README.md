@@ -1,0 +1,126 @@
+# swcviz — 3D Visualization of SWC Neuronal Morphologies
+
+swcviz is a Python package for loading, analyzing, and visualizing neuronal morphologies stored in the SWC format. It is designed for interactive use in Jupyter notebooks and leverages Plotly for 3D visualization and NetworkX for graph-based topology.
+
+Status: pre-alpha (planning and documentation). Code will follow once the initial design is finalized.
+
+## Features (planned)
+
+- SWC parser to load morphologies into a graph data model
+- `SWCModel` class (subclass of `networkx.DiGraph`) that holds nodes and edges with rich attributes
+- Centroid (skeleton) visualization in 3D via `plotly.graph_objects.Scatter3d`
+- Volumetric visualization (with radii) using frusta meshes via `plotly.graph_objects.Mesh3d`
+- Segment API to represent an edge as a truncated cone (frustum) between two points with radii
+- Time-varying scalar fields on segments for dynamics and animations (e.g., color segment i by V_i(t))
+- Example notebooks for analysis and visualization workflows
+
+## Why SWC?
+
+The SWC format is a simple text-based convention widely used for representing neuronal morphologies as trees (or forests) of 3D points. Each point has a type, 3D coordinates, a radius, and a parent pointer. This structure is well-suited for graph analysis and 3D rendering.
+
+### SWC format primer
+
+An SWC file is a series of lines with either comments or 7 space-separated columns:
+
+```text
+# Example SWC header/comment lines start with '#'
+# n T x y z r parent
+1 1 0.0 0.0 0.0 5.0 -1
+2 3 2.0 0.0 0.0 1.0 1
+3 3 4.0 0.0 0.0 0.8 2
+```
+
+Columns:
+
+- `n`: integer node id (unique within the file)
+- `T`: structure type (commonly used codes below)
+- `x y z`: coordinates (usually micrometers)
+- `r`: radius
+- `parent`: id of the parent node; `-1` indicates a root (no parent)
+
+Typical type (T) codes in practice:
+
+- 1: soma
+- 2: axon
+- 3: dendrite
+- 4: apical dendrite
+- 5: fork point
+- 6: end point
+- 7: custom
+- 0 and 8+ are seen as unspecified or reserved; conventions can vary by dataset
+
+In this project we call the node-only graph (ignoring radii) the “centroid” or skeleton view. The volumetric view uses the radii and connectivity to generate piecewise truncated cones (frusta) connecting parent-child pairs.
+
+Authoritative references:
+
+- [SWC specification (NeuronLand)](http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html)
+- [INCF SWC page](https://www.incf.org/swc)
+- [SWC+ extension (optional, future consideration)](https://neuroinformatics.nl/swcPlus/)
+
+## Design overview
+
+- `SWCModel` (planned): a subclass of `networkx.DiGraph`
+  - Nodes keyed by SWC id `n`
+  - Node attributes: `x`, `y`, `z`, `r`, `t` (type), and optional metadata
+  - Directed edges from parent ➔ child; supports multiple components (a forest)
+- `Segment` (planned): a small data object describing a frustum between two nodes `a` and `b` with radii `r_a` and `r_b`
+  - Provides geometry (mesh) construction for Plotly `Mesh3d`
+- Visualization
+  - Centroid view: `Scatter3d` lines/markers along the graph structure
+  - Volumetric view: tessellated frusta (and spheres/caps as needed for soma or terminals)
+  - Dynamics (future): time-dependent scalars per segment for color mapping and animations
+
+## Project roadmap
+
+See `TODO.md` for a detailed, checkbox-based plan. Early milestones:
+
+- Parse SWC to `SWCModel`
+- Plot centroid skeleton in Plotly 3D
+- Generate frusta meshes for volumetric rendering
+
+## Getting started (development)
+
+This project uses the `uv` package manager for Python.
+
+- Create a virtual environment:
+
+```bash
+uv venv
+```
+
+- Add dependencies (to be finalized with code):
+
+```bash
+uv add networkx plotly numpy pandas
+```
+
+- Run scripts and examples (when available):
+
+```bash
+uv run python -m swcviz
+```
+
+- Use in Jupyter once the package is implemented:
+  - Launch a notebook and import `swcviz`
+  - Load an SWC file, then call `plot_centroid(...)` or `plot_volumetric(...)`
+
+Note: The package is not yet on PyPI; installation and packaging will be set up after the initial implementation.
+
+## Examples (coming soon)
+
+- Basic loading and centroid plotting
+- Volumetric rendering of a neuron
+- Dynamics over segments (animated color mapping)
+
+## Contributing
+
+Contributions are welcome once the initial scaffold lands. Planned setup includes linting, formatting, and tests via CI.
+
+## License
+
+MIT License
+
+## Acknowledgements
+
+- Community conventions around SWC and tools in the ecosystem
+- NetworkX and Plotly for the backbone of graph analysis and 3D visualization

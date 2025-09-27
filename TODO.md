@@ -1,0 +1,154 @@
+# swcviz TODO and roadmap
+
+This document tracks the plan for building `swcviz`, a Python library for 3D visualization of neuronal morphologies in SWC format, optimized for Jupyter with Plotly and a graph-based core using NetworkX.
+
+Status: planning. No public API is stable yet.
+
+## Guiding principles
+
+- Prefer simple, composable APIs that work well in notebooks.
+- Separate parsing (I/O), data model, geometry, and visualization concerns.
+- Make default plots beautiful yet configurable.
+- Keep computational geometry numerically stable and reasonably fast (vectorize with NumPy where practical).
+
+## Milestones and tasks
+
+### M0 — Documentation and planning
+
+- [x] Draft `README.md` with overview, features, and references
+- [x] Draft `TODO.md` roadmap (this file)
+
+### M1 — Project scaffolding
+
+- [ ] Decide initial package layout
+  - `swcviz/` package with modules:
+    - `io.py` (SWC reader/validator)
+    - `model.py` (`SWCModel` subclassing `networkx.DiGraph`)
+    - `geometry.py` (`Segment` frustum construction, helper math)
+    - `viz.py` (centroid and volumetric plotting)
+    - `animation.py` (time-dependent scalar visualization)
+    - `utils.py` (common helpers)
+  - `data/` sample SWC files (small, clearly licensed)
+  - `notebooks/` examples for Jupyter (user-authored; do not auto-create notebooks)
+  - `tests/` unit tests
+- [ ] Initialize packaging with `pyproject.toml`
+  - Core deps: `networkx`, `plotly`, `numpy`
+  - Nice-to-have: `pandas` (tabular ops), `scipy` (optional geometry)
+  - Dev deps: `pytest`, `ruff`, `black`, `mypy` (optional)
+- [ ] Add `LICENSE` (MIT) and set `license` metadata and classifiers in `pyproject.toml`
+- [ ] Review runtime vs dev dependencies; move `pytest` to dev; make Jupyter optional; drop `matplotlib` unless needed
+- [ ] Configure `uv` workflow (venv, add deps, run scripts)
+- [ ] Set up linters/formatters and pre-commit hooks
+- [ ] Add GitHub Actions CI (lint + test)
+
+### M2 — Data model
+
+- [ ] Implement `SWCModel(networkx.DiGraph)`
+  - Node key: SWC id `n` (int)
+  - Node attrs: `t` (type), `x`, `y`, `z` (floats), `r` (float), optional `meta`
+  - Directed edges: parent ➔ child; support forest (multiple roots)
+- [ ] Implement `GeneralModel(networkx.Graph)` for visualization and reconnection support
+  - Undirected graph built from `SWCModel` plus header reconnections
+  - Methods:
+    - `from_swc_model(swc: SWCModel, reconnect: bool = True)`
+    - `merge_nodes(u: int, v: int)` with invariants: equal `(x, y, z, r)`; union of edges; preserve attributes; record provenance
+  - Node attribute policy: preserve SWC attributes and add `original_ids: set[int]` and optional `merged_from`
+- [ ] Convenience methods
+  - `from_swc(path_or_buffer)` classmethod
+  - `to_dataframe()` for easy inspection
+  - `segments()` iterator yielding parent-child pairs and attributes
+  - `to_general_model(reconnect: bool = True)` to apply header-based reconnections
+  - `roots()`, `components()`, `depths()` utilities
+- [ ] Validation helpers
+  - Ensure unique ids; parent either `-1` or existing id
+  - Detect cycles, missing parents, invalid radii/coords
+
+### M3 — SWC parser and I/O
+
+- [ ] Robust SWC reader
+  - Skip comment lines (`#`), parse 7 columns: `n T x y z r parent`
+  - Strong typing and error messages with line numbers
+  - Accept path, file-like objects, and strings
+- [ ] Header annotations and reconnection
+  - Parse lines like `# CYCLE_BREAK reconnect i j` into reconnection pairs
+  - After parsing, validate each pair has identical `(x, y, z, r)`; otherwise raise an error
+  - Support transitive merges (e.g., `i j`, `j k`) via union-find or equivalent grouping
+  - Expose reconnection info to `SWCModel.to_general_model()` for merge application
+- [ ] Validation layer (configurable strictness)
+  - Enforce unique ids; check parent before child; allow out-of-order with fixup
+  - Type code handling (1=soma, 2=axon, 3=dendrite, 4=apical, etc.)
+  - Tolerate unknown type codes but record them
+- [ ] Unit tests with known-good and failure cases (including header reconnection scenarios)
+
+### M4 — Centroid (skeleton) visualization
+
+- [ ] Build edge list from `GeneralModel` suitable for `plotly.graph_objects.Scatter3d`
+- [ ] `plot_centroid(general_model, ...) -> go.Figure`
+  - Options: color by type/depth/component, show markers vs lines, line width scaling by radius (optional)
+  - Aspect ratio, axis labels, background theme presets
+- [ ] Tests (figure structure, traces present, basic property checks)
+
+### M5 — Segment geometry (frusta) and volumetric visualization
+
+- [ ] `Segment` data structure
+  - Oriented frustum between points `a` and `b` with radii `r_a`, `r_b`
+  - Tunable circumferential resolution (e.g., 12–32 sides)
+  - Stable local frame construction for mesh generation
+  - Optional end caps; degenerate handling (very short segments, zero radius)
+- [ ] Mesh batching utilities
+  - Generate vertices and faces for entire model
+  - One `Mesh3d` per model (batched) vs per-segment trade-offs
+- [ ] `plot_volumetric(general_model, ...) -> go.Figure`
+  - Color mapping by segment id/type or by external scalar array
+  - Performance passes for moderate-sized morphologies
+- [ ] Geometry tests (vertex counts, invariants, edge cases)
+
+### M6 — Dynamics (time-dependent scalars on segments)
+
+- [ ] Data container for per-segment time series `V_i(t)`
+- [ ] `animate_segments(model, values, times, ...)` for Plotly animations
+- [ ] Color scales, legend, and playback controls
+- [ ] Example notebook with synthetic dynamics
+
+### M7 — Examples and documentation
+
+- [ ] Notebooks will be authored by the user; do not auto-create. Provide code snippets and recipe outlines in README/docstrings
+- [ ] Document notebook outlines: centroid, volumetric, dynamics
+- [ ] Add small sample SWC files under `data/` for user notebooks
+- [ ] Narrative docs: quick start, API reference, FAQ (including `GeneralModel` and reconnection semantics)
+
+### M8 — Testing and quality
+
+- [ ] Parser tests (happy path + failures)
+- [ ] Reconnection tests: header parsing, merge invariants (equal `(x, y, z, r)`), union-of-edges, multi-pair groups, error cases
+- [ ] Geometry tests (numerical stability, rotations)
+- [ ] Visualization tests (figure JSON structure)
+- [ ] CI green across supported Python versions
+
+### M9 — Packaging and release
+
+- [ ] Finalize metadata (license = MIT, authors, classifiers)
+- [ ] Version v0.1.0 pre-release
+- [ ] Publish examples and docs; consider Read the Docs or GitHub Pages
+
+### M10 — Future enhancements (backlog)
+
+- [ ] SWC+ support and annotations
+- [ ] Morphometrics (branch order, path length, Sholl analysis)
+- [ ] Smoothing/resampling along centerlines
+- [ ] Export to common 3D formats (e.g., glTF)
+- [ ] Import from NeuroMorpho or other repositories
+
+## References
+
+- [SWC specification (NeuronLand)](http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html)
+- [INCF SWC page](https://www.incf.org/swc)
+- [SWC+ extension (future consideration)](https://neuroinformatics.nl/swcPlus/)
+
+## Development notes
+- This project uses `uv` for environment and dependency management.
+- Typical workflow:
+  - `uv venv` — create a virtual env
+  - `uv add <deps>` — add dependencies
+  - `uv run <cmd>` — run scripts (tests, examples)
+- Plotly is chosen for interactive 3D rendering in notebooks; NetworkX underpins the graph model.
