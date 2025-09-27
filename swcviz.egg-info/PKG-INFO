@@ -1,3 +1,17 @@
+Metadata-Version: 2.4
+Name: swcviz
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: ipykernel>=6.30.1
+Requires-Dist: jupyter>=1.1.1
+Requires-Dist: matplotlib>=3.10.6
+Requires-Dist: networkx>=3.5
+Requires-Dist: numpy>=2.3.3
+Requires-Dist: plotly>=6.3.0
+Requires-Dist: pytest>=8.4.2
+
 # swcviz — 3D Visualization of SWC Neuronal Morphologies
 
 swcviz is a Python package for loading, analyzing, and visualizing neuronal morphologies stored in the SWC format. It is designed for interactive use in Jupyter notebooks and leverages Plotly for 3D visualization and NetworkX for graph-based topology.
@@ -8,8 +22,10 @@ Status: pre-alpha (planning and documentation). Code will follow once the initia
 
 - SWC parser to load morphologies into a graph data model
 - `SWCModel` class (subclass of `networkx.DiGraph`) that holds nodes and edges with rich attributes
+- Centroid (skeleton) visualization in 3D via `plotly.graph_objects.Scatter3d`
 - Volumetric visualization (with radii) using frusta meshes via `plotly.graph_objects.Mesh3d`
 - Time-varying scalar fields on segments for dynamics and animations (e.g., color segment i by V_i(t))
+- Example notebooks for analysis and visualization workflows
 
 ## Why SWC?
 
@@ -17,26 +33,23 @@ The SWC format is a simple text-based convention widely used for representing ne
 
 An SWC file is a series of lines with either comments or 7 space-separated columns:
 
-
-```text
+```
 # Example SWC header/comment lines start with '#'
 # n T x y z r parent
 1 1 0.0 0.0 0.0 5.0 -1
 2 3 2.0 0.0 0.0 1.0 1
 3 3 4.0 0.0 0.0 0.8 2
-```
-
 Columns:
 
 - `n`: integer node id (unique within the file)
 - `T`: structure type (commonly used codes below)
 - `x y z`: coordinates (usually micrometers)
 - `r`: radius
-- `parent`: id of the parent node; `-1` indicates a root (no parent)
 
 Typical type (T) codes in practice:
 
 - 1: soma
+- 2: axon
 - 3: dendrite
 - 4: apical dendrite
 - 5: fork point
@@ -97,7 +110,7 @@ uv run pytest -q
   - Launch a notebook and import `swcviz`
   - Load an SWC file, then call `plot_centroid(...)` or `plot_volumetric(...)`
 
-Note: The package is not yet on PyPI; use the editable install above during development.
+  Note: The package is not yet on PyPI; use the editable install above during development.
 
 ## Examples (coming soon)
 

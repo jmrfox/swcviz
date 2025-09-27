@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+swcviz/__init__.py
+swcviz/io.py
+swcviz.egg-info/PKG-INFO
+swcviz.egg-info/SOURCES.txt
+swcviz.egg-info/dependency_links.txt
+swcviz.egg-info/requires.txt
+swcviz.egg-info/top_level.txt
+tests/test_io.py
