@@ -18,9 +18,14 @@ Demo notebooks can be found in the `notebooks` directory.
 - **Geometry**:
   - `Segment` dataclass and frustum meshing utilities (`frustum_mesh`, `batch_frusta`)
   - `FrustaSet.from_general_model()` to build a batched frusta mesh from a `GeneralModel`
+  - `PointSet` for low-res spheres at arbitrary xyz points (for overlay markers)
 - **Visualization**:
   - `plot_centroid(general_model, ...)` for skeleton plotting (`Scatter3d`)
-  - `plot_frusta(frusta_set, ...)` for volumetric frusta rendering (`Mesh3d`)
+  - `plot_frusta(frusta_set, ..., radius_scale=1.0)` for volumetric frusta rendering (`Mesh3d`)
+  - `plot_frusta_with_centroid(gm, frusta, ...)` to overlay skeleton and mesh
+  - `plot_frusta_slider(frusta, min_scale, max_scale, steps)` interactive radius scale slider
+  - `plot_model(...)` master entry point combining centroid, frusta, slider, and `PointSet` overlays
+  - Global config via `set_config(...)` (equal axes enforced by default, width/height, template)
 - Roadmap: time-varying scalars and animations
 
 ## Design overview
@@ -32,11 +37,21 @@ Demo notebooks can be found in the `notebooks` directory.
   - Built from `SWCParseResult` with header-based reconnection merges
   - Node attributes preserved; provenance includes `merged_ids`, `lines`
 - `Segment` dataclass and `FrustaSet` (batched frusta mesh)
-- Visualization functions in `viz.py`: `plot_centroid`, `plot_frusta`
+- `PointSet` (batched spheres for overlay points)
+- Visualization functions in `viz.py`: `plot_centroid`, `plot_frusta`, `plot_frusta_with_centroid`, `plot_frusta_slider`, `plot_model`
 
 - Use in Jupyter:
   - Launch a notebook and import `swcviz`
   - Load or paste an SWC and use `GeneralModel`, `FrustaSet`, `plot_centroid`, `plot_frusta`
+
+## Configuration (Plotly)
+
+```python
+from swcviz import set_config
+
+# Enforce equal x/y/z scale globally (default True) and size
+set_config(force_equal_axes=True, width=800, height=600)
+```
 
 ## Acknowledgements
 

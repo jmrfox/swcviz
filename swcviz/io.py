@@ -77,6 +77,12 @@ class SWCParseResult:
     reconnections: List[Tuple[int, int]]
     comments: List[str]
 
+    def __str__(self) -> str:
+        return f"SWCParseResult(records={len(self.records)}, reconnections={len(self.reconnections)}, comments={len(self.comments)})"
+
+    def __repr__(self) -> str:
+        return str(self)
+
 
 # Regex to capture reconnection directives in header comment lines
 _RECONNECT_RE = re.compile(

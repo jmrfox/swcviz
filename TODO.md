@@ -24,8 +24,9 @@ Status: planning. No public API is stable yet.
   - `swcviz/` package with modules:
     - [x] `io.py` (SWC reader/validator: `parse_swc`, `SWCRecord`, `SWCParseResult`)
     - [x] `model.py` (`SWCModel` DiGraph; `GeneralModel` Graph; `_graph_attributes`; `print_attributes`)
-    - [x] `geometry.py` (`Segment` frustum construction, helper math)
-    - [x] `viz.py` (centroid and volumetric plotting)
+    - [x] `geometry.py` (`Segment` frustum construction, `PointSet` spheres, helper math)
+    - [x] `viz.py` (centroid, volumetric, `plot_model`, slider, overlay points)
+    - [x] `config.py` (global Plotly config + `apply_layout`, equal-axes enforcement)
     - [ ] `animation.py` (time-dependent scalar visualization)
     - [ ] `utils.py` (common helpers)
   - `data/` sample SWC files (small, clearly licensed)
@@ -96,6 +97,11 @@ Status: planning. No public API is stable yet.
   - One `Mesh3d` per model (batched) vs per-segment trade-offs
   - Color mapping by segment id/type or by external scalar array
   - Performance passes for moderate-sized morphologies
+- [x] Add uniform radius scaling for volumetric mesh (`plot_frusta(radius_scale=...)`)
+- [x] Overlay centroid + frusta (`plot_frusta_with_centroid`)
+- [x] Interactive radius slider (`plot_frusta_slider`)
+- [x] Master plotting entry point `plot_model(...)` (centroid + frusta + slider + points)
+- [x] `PointSet` geometry (low-res spheres) and integration into `plot_model`
 - [ ] Geometry tests (vertex counts, invariants, edge cases)
 
 ### M6 — Dynamics (time-dependent scalars on segments)
@@ -110,7 +116,12 @@ Status: planning. No public API is stable yet.
 - [ ] Notebooks will be authored by the user; do not auto-create. Provide code snippets and recipe outlines in README/docstrings
 - [ ] Document notebook outlines: centroid, volumetric, dynamics
 - [ ] Add small sample SWC files under `data/` for user notebooks
-- [ ] Narrative docs: quick start, API reference, FAQ (including `GeneralModel` and reconnection semantics)
+- [x] Installation page (`docs/install.md`)
+- [x] Visualization page with `plot_model`, slider, and `PointSet` (`docs/visualization.md`)
+- [x] Update quick start to use `plot_model` (`docs/index.md`)
+- [x] API reference via mkdocstrings (`docs/api.md`)
+- [x] MkDocs nav + GitHub Pages workflow for docs
+- [ ] FAQ including `GeneralModel` reconnection semantics and usage tips
 
 ### M8 — Testing and quality
 
@@ -118,6 +129,9 @@ Status: planning. No public API is stable yet.
 - [ ] Reconnection tests: header parsing, merge invariants (equal `(x, y, z, r)`), union-of-edges, multi-pair groups, error cases
 - [ ] Geometry tests (numerical stability, rotations)
 - [ ] Visualization tests (figure JSON structure)
+- [ ] Tests for `FrustaSet.scaled` (counts unchanged, geometry changes)
+- [ ] Tests for `PointSet` (sphere vertex/face counts, `from_txt` parsing)
+- [ ] Tests for `plot_model` slider frames and equal-axes layout
 - [ ] CI green across supported Python versions
 
 ### M9 — Packaging and release

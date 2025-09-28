@@ -13,6 +13,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Visualization: visualization.md
   - Installation: install.md
   - API: api.md
 

@@ -4,12 +4,15 @@ Jupyter-first 3D visualization of SWC neuronal morphologies using NetworkX and P
 
 - Parse SWC into directed `SWCModel` and undirected `GeneralModel`
 - Visualize skeletons (centroid) with `plot_centroid`
-- Build volumetric frusta meshes with `FrustaSet` and `plot_frusta`
+- Build volumetric frusta meshes with `FrustaSet`, or use the master `plot_model`
 
 ## Quick start
 
 ```python
-from swcviz import parse_swc, GeneralModel, FrustaSet, plot_centroid, plot_frusta
+from swcviz import parse_swc, GeneralModel, FrustaSet, PointSet, plot_model, set_config
+
+# Optional: global viz settings (equal axes enforced by default)
+set_config(width=800, height=600)
 
 swc = """
 # CYCLE_BREAK reconnect 2 3
@@ -20,9 +23,18 @@ swc = """
 """.strip()
 
 gm = GeneralModel.from_swc_file(swc, strict=True, validate_reconnections=True)
-fig1 = plot_centroid(gm, show_nodes=True)
-fr = FrustaSet.from_general_model(gm, sides=20, end_caps=False)
-fig2 = plot_frusta(fr)
+fr = FrustaSet.from_general_model(gm, sides=16, end_caps=False)
+
+# Optional overlay points (as small spheres)
+ps = PointSet.from_points([(0,0,0), (3,0,0)], base_radius=0.05)
+
+# One-call visualization
+fig = plot_model(gm=gm, frusta=fr, show_centroid=True, point_set=ps, radius_scale=0.8)
+fig.show()
+
+# Interactive radius slider (0..1)
+fig_slider = plot_model(gm=gm, frusta=fr, slider=True, min_scale=0.0, max_scale=1.0, steps=21)
+fig_slider.show()
 ```
 
-See the API reference for details.
+See the Visualization and API reference pages for details.
