@@ -95,6 +95,7 @@ Desktop.ini
 # Project-specific
 ###############################
 .windsurf/
+.windsurf/rules/
 tmp/
 temp/
 *.tmp
