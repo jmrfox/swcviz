@@ -2,14 +2,22 @@
 
 swcviz is a Python package for loading, analyzing, and visualizing neuronal morphologies stored in the SWC format. It is designed for interactive use in Jupyter notebooks and leverages Plotly for 3D visualization and NetworkX for graph-based topology.
 
-Status: pre-alpha (planning and documentation). Code will follow once the initial design is finalized.
+Status: pre-alpha, actively evolving. Core parsing, models, geometry, and basic visualization are implemented.
 
-## Features (planned)
+## Features
 
-- SWC parser to load morphologies into a graph data model
-- `SWCModel` class (subclass of `networkx.DiGraph`) that holds nodes and edges with rich attributes
-- Volumetric visualization (with radii) using frusta meshes via `plotly.graph_objects.Mesh3d`
-- Time-varying scalar fields on segments for dynamics and animations (e.g., color segment i by V_i(t))
+- **SWC parser**: `parse_swc()` with robust error messages, header reconnection directives, iterable/file/string sources
+- **Data models**:
+  - `SWCModel` (`networkx.DiGraph`) for directed parent➔child topology with node attributes (`t, x, y, z, r`)
+  - `GeneralModel` (`networkx.Graph`) for visualization; applies `# CYCLE_BREAK reconnect i j` merges (union-find)
+  - Shared graph metrics via `_graph_attributes()` and `print_attributes()` helpers
+- **Geometry**:
+  - `Segment` dataclass and frustum meshing utilities (`frustum_mesh`, `batch_frusta`)
+  - `FrustaSet.from_general_model()` to build a batched frusta mesh from a `GeneralModel`
+- **Visualization**:
+  - `plot_centroid(general_model, ...)` for skeleton plotting (`Scatter3d`)
+  - `plot_frusta(frusta_set, ...)` for volumetric frusta rendering (`Mesh3d`)
+- Roadmap: time-varying scalars and animations
 
 ## Why SWC?
 
@@ -53,22 +61,48 @@ Authoritative references:
 
 ## Design overview
 
-- `SWCModel` (planned): a subclass of `networkx.DiGraph`
+- `SWCModel` (`networkx.DiGraph`)
   - Nodes keyed by SWC id `n`
   - Node attributes: `x`, `y`, `z`, `r`, `t` (type), and optional metadata
   - Directed edges from parent ➔ child; supports multiple components (a forest)
-- `Segment` (planned): a small data object describing a frustum between two nodes `a` and `b` with radii `r_a` and `r_b`
-  - Provides geometry (mesh) construction for Plotly `Mesh3d`
-- Visualization
-  - Centroid view: `Scatter3d` lines/markers along the graph structure
-  - Volumetric view: tessellated frusta (and spheres/caps as needed for soma or terminals)
-  - Dynamics (future): time-dependent scalars per segment for color mapping and animations
+- `GeneralModel` (`networkx.Graph`)
+  - Built from `SWCParseResult` with header-based reconnection merges
+  - Node attributes preserved; provenance includes `merged_ids`, `lines`
+- `Segment` dataclass and `FrustaSet` (batched frusta mesh)
+- Visualization functions in `viz.py`: `plot_centroid`, `plot_frusta`
 
-## Project roadmap
+## Quick start
 
-- Parse SWC to `SWCModel`
-- Plot centroid skeleton in Plotly 3D
-- Generate frusta meshes for volumetric rendering
+```python
+from swcviz import (
+    parse_swc,
+    GeneralModel,
+    FrustaSet,
+    plot_centroid,
+    plot_frusta,
+)
+
+swc_text = """
+# CYCLE_BREAK reconnect 2 3
+1 1 0 0 0 1 -1
+2 3 2 0 0 0.5 1
+3 3 2 0 0 0.5 1
+4 3 3 0 0 0.4 2
+""".strip()
+
+# Build visualization graph and inspect
+gm = GeneralModel.from_swc_file(swc_text, strict=True, validate_reconnections=True)
+gm.print_attributes()
+
+# Centroid (skeleton) plot
+fig_centroid = plot_centroid(gm, show_nodes=True)
+fig_centroid.show()
+
+# Volumetric frusta plot
+fr = FrustaSet.from_general_model(gm, sides=20, end_caps=False)
+fig_frusta = plot_frusta(fr, color="lightblue", opacity=0.85)
+fig_frusta.show()
+```
 
 ## Getting started (development)
 
@@ -92,9 +126,9 @@ uv pip install -e .
 uv run pytest -q
 ```
 
-- Use in Jupyter once the package is implemented:
+- Use in Jupyter:
   - Launch a notebook and import `swcviz`
-  - Load an SWC file, then call `plot_centroid(...)` or `plot_volumetric(...)`
+  - Load or paste an SWC and use `GeneralModel`, `FrustaSet`, `plot_centroid`, `plot_frusta`
 
 Note: The package is not yet on PyPI; use the editable install above during development.
 

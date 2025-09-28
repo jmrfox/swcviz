@@ -25,7 +25,7 @@ Status: planning. No public API is stable yet.
     - [x] `io.py` (SWC reader/validator: `parse_swc`, `SWCRecord`, `SWCParseResult`)
     - [x] `model.py` (`SWCModel` DiGraph; `GeneralModel` Graph; `_graph_attributes`; `print_attributes`)
     - [x] `geometry.py` (`Segment` frustum construction, helper math)
-    - [ ] `viz.py` (centroid and volumetric plotting)
+    - [x] `viz.py` (centroid and volumetric plotting)
     - [ ] `animation.py` (time-dependent scalar visualization)
     - [ ] `utils.py` (common helpers)
   - `data/` sample SWC files (small, clearly licensed)
@@ -35,7 +35,7 @@ Status: planning. No public API is stable yet.
   - Core deps: `networkx`, `plotly`, `numpy`
   - Nice-to-have: `pandas` (tabular ops), `scipy` (optional geometry)
   - Dev deps: `pytest`, `ruff`, `black`, `mypy` (optional)
-- [ ] Add `LICENSE` (MIT) and set `license` metadata and classifiers in `pyproject.toml`
+- [x] Add `LICENSE` (MIT) and set `license` metadata and classifiers in `pyproject.toml`
 - [ ] Review runtime vs dev dependencies; move `pytest` to dev; make Jupyter optional; drop `matplotlib` unless needed
 - [ ] Configure `uv` workflow (venv, add deps, run scripts)
 - [ ] Set up linters/formatters and pre-commit hooks
@@ -75,29 +75,25 @@ Status: planning. No public API is stable yet.
   - Reconnection pairs exposed on `SWCParseResult.reconnections`
 - [ ] Validation layer (configurable strictness)
   - Enforce unique ids; check parent before child; allow out-of-order with fixup
-  - Type code handling (1=soma, 2=axon, 3=dendrite, 4=apical, etc.)
-  - Tolerate unknown type codes but record them
-- [ ] Unit tests with known-good and failure cases (including header reconnection scenarios)
 
 ### M4 — Centroid (skeleton) visualization
 
-- [ ] Build edge list from `GeneralModel` suitable for `plotly.graph_objects.Scatter3d`
-- [ ] `plot_centroid(general_model, ...) -> go.Figure`
+- [x] Build edge list from `GeneralModel` suitable for `plotly.graph_objects.Scatter3d`
+- [x] `plot_centroid(general_model, ...) -> go.Figure`
   - Options: color by type/depth/component, show markers vs lines, line width scaling by radius (optional)
   - Aspect ratio, axis labels, background theme presets
-- [ ] Tests (figure structure, traces present, basic property checks)
+  - Tests (figure structure, traces present, basic property checks)
 
 ### M5 — Segment geometry (frusta) and volumetric visualization
 
 - [x] `Segment` data structure
   - Oriented frustum between points `a` and `b` with radii `r_a`, `r_b`
-  - Tunable circumferential resolution (e.g., 12–32 sides)
   - Stable local frame construction for mesh generation
   - Optional end caps; degenerate handling (very short segments, zero radius)
+
 - [x] Mesh batching utilities
   - Generate vertices and faces for entire model
   - One `Mesh3d` per model (batched) vs per-segment trade-offs
-- [ ] `plot_volumetric(general_model, ...) -> go.Figure`
   - Color mapping by segment id/type or by external scalar array
   - Performance passes for moderate-sized morphologies
 - [ ] Geometry tests (vertex counts, invariants, edge cases)
