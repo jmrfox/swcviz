@@ -13,6 +13,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Installation: install.md
   - API: api.md
 
 markdown_extensions:
