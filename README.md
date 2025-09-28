@@ -17,7 +17,6 @@ The SWC format is a simple text-based convention widely used for representing ne
 
 An SWC file is a series of lines with either comments or 7 space-separated columns:
 
-
 ```text
 # Example SWC header/comment lines start with '#'
 # n T x y z r parent

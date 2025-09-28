@@ -20,14 +20,14 @@ Status: planning. No public API is stable yet.
 
 ### M1 — Project scaffolding
 
-- [ ] Decide initial package layout
+- [x] Decide initial package layout (initial modules in place)
   - `swcviz/` package with modules:
-    - `io.py` (SWC reader/validator)
-    - `model.py` (`SWCModel` subclassing `networkx.DiGraph`)
-    - `geometry.py` (`Segment` frustum construction, helper math)
-    - `viz.py` (centroid and volumetric plotting)
-    - `animation.py` (time-dependent scalar visualization)
-    - `utils.py` (common helpers)
+    - [x] `io.py` (SWC reader/validator: `parse_swc`, `SWCRecord`, `SWCParseResult`)
+    - [x] `model.py` (`SWCModel` DiGraph; `GeneralModel` Graph; `_graph_attributes`; `print_attributes`)
+    - [x] `geometry.py` (`Segment` frustum construction, helper math)
+    - [ ] `viz.py` (centroid and volumetric plotting)
+    - [ ] `animation.py` (time-dependent scalar visualization)
+    - [ ] `utils.py` (common helpers)
   - `data/` sample SWC files (small, clearly licensed)
   - `notebooks/` examples for Jupyter (user-authored; do not auto-create notebooks)
   - `tests/` unit tests
@@ -43,16 +43,15 @@ Status: planning. No public API is stable yet.
 
 ### M2 — Data model
 
-- [ ] Implement `SWCModel(networkx.DiGraph)`
+- [x] Implement `SWCModel(networkx.DiGraph)`
   - Node key: SWC id `n` (int)
   - Node attrs: `t` (type), `x`, `y`, `z` (floats), `r` (float), optional `meta`
   - Directed edges: parent ➔ child; support forest (multiple roots)
-- [ ] Implement `GeneralModel(networkx.Graph)` for visualization and reconnection support
-  - Undirected graph built from `SWCModel` plus header reconnections
-  - Methods:
-    - `from_swc_model(swc: SWCModel, reconnect: bool = True)`
-    - `merge_nodes(u: int, v: int)` with invariants: equal `(x, y, z, r)`; union of edges; preserve attributes; record provenance
-  - Node attribute policy: preserve SWC attributes and add `original_ids: set[int]` and optional `merged_from`
+- [x] Implement `GeneralModel(networkx.Graph)` for visualization and reconnection support
+  - Undirected graph built with header reconnections (`CYCLE_BREAK reconnect i j`)
+  - Constructors: `from_parse_result(...)`, `from_swc_file(...)`
+  - Merge policy: union-find over reconnect pairs (requires identical `(x, y, z, r)`), provenance via `merged_ids`, `lines`
+- [x] Graph metrics and printing helpers (`_graph_attributes`, `SWCModel.print_attributes`, `GeneralModel.print_attributes`)
 - [ ] Convenience methods
   - `from_swc(path_or_buffer)` classmethod
   - `to_dataframe()` for easy inspection
@@ -65,15 +64,15 @@ Status: planning. No public API is stable yet.
 
 ### M3 — SWC parser and I/O
 
-- [ ] Robust SWC reader
+- [x] Robust SWC reader
   - Skip comment lines (`#`), parse 7 columns: `n T x y z r parent`
   - Strong typing and error messages with line numbers
   - Accept path, file-like objects, and strings
-- [ ] Header annotations and reconnection
+- [x] Header annotations and reconnection
   - Parse lines like `# CYCLE_BREAK reconnect i j` into reconnection pairs
-  - After parsing, validate each pair has identical `(x, y, z, r)`; otherwise raise an error
-  - Support transitive merges (e.g., `i j`, `j k`) via union-find or equivalent grouping
-  - Expose reconnection info to `SWCModel.to_general_model()` for merge application
+  - Validation of identical `(x, y, z, r)` available (configurable)
+  - Transitive merges supported in `GeneralModel` via union-find
+  - Reconnection pairs exposed on `SWCParseResult.reconnections`
 - [ ] Validation layer (configurable strictness)
   - Enforce unique ids; check parent before child; allow out-of-order with fixup
   - Type code handling (1=soma, 2=axon, 3=dendrite, 4=apical, etc.)
@@ -90,12 +89,12 @@ Status: planning. No public API is stable yet.
 
 ### M5 — Segment geometry (frusta) and volumetric visualization
 
-- [ ] `Segment` data structure
+- [x] `Segment` data structure
   - Oriented frustum between points `a` and `b` with radii `r_a`, `r_b`
   - Tunable circumferential resolution (e.g., 12–32 sides)
   - Stable local frame construction for mesh generation
   - Optional end caps; degenerate handling (very short segments, zero radius)
-- [ ] Mesh batching utilities
+- [x] Mesh batching utilities
   - Generate vertices and faces for entire model
   - One `Mesh3d` per model (batched) vs per-segment trade-offs
 - [ ] `plot_volumetric(general_model, ...) -> go.Figure`
@@ -146,6 +145,7 @@ Status: planning. No public API is stable yet.
 - [SWC+ extension (future consideration)](https://neuroinformatics.nl/swcPlus/)
 
 ## Development notes
+
 - This project uses `uv` for environment and dependency management.
 - Typical workflow:
   - `uv venv` — create a virtual env
