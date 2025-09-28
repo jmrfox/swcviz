@@ -1,3 +1,100 @@
-.pytest_cache
-.venv
-.windsurf
+###############################
+# Python
+###############################
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.pyd
+*.dll
+
+###############################
+# Packaging / build
+###############################
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+###############################
+# Virtual environments
+###############################
+.venv/
+venv/
+env/
+ENV/
+.conda/
+.python-version
+
+###############################
+# Installers / logs
+###############################
+pip-log.txt
+pip-delete-this-directory.txt
+*.log
+logs/
+
+###############################
+# Testing / coverage
+###############################
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+coverage.xml
+nosetests.xml
+*.cover
+*.py,cover
+.cache/
+
+###############################
+# Jupyter
+###############################
+.ipynb_checkpoints/
+
+###############################
+# MkDocs
+###############################
+site/
+
+###############################
+# IDE / editor
+###############################
+.vscode/
+.idea/
+*.iml
+
+###############################
+# OS files
+###############################
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+###############################
+# Project-specific
+###############################
+.windsurf/
+tmp/
+temp/
+*.tmp
