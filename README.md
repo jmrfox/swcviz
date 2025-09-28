@@ -104,6 +104,20 @@ fig_frusta = plot_frusta(fr, color="lightblue", opacity=0.85)
 fig_frusta.show()
 ```
 
+## Installation
+
+- Install directly from GitHub (latest main):
+
+```bash
+pip install "git+https://github.com/jmrfox/swcviz.git"
+```
+
+- Or editable install for development:
+
+```bash
+uv pip install -e .
+```
+
 ## Getting started (development)
 
 This project uses the `uv` package manager for Python.
@@ -130,7 +144,14 @@ uv run pytest -q
   - Launch a notebook and import `swcviz`
   - Load or paste an SWC and use `GeneralModel`, `FrustaSet`, `plot_centroid`, `plot_frusta`
 
-Note: The package is not yet on PyPI; use the editable install above during development.
+## Documentation
+
+- GitHub Pages (built via MkDocs): [https://jmrfox.github.io/swcviz/](https://jmrfox.github.io/swcviz/)
+- Build locally:
+
+```bash
+uv run mkdocs serve
+```
 
 ## Examples (coming soon)
 
