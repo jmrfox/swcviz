@@ -28,7 +28,6 @@ Status: planning. No public API is stable yet.
     - [x] `viz.py` (centroid, volumetric, `plot_model`, slider, overlay points)
     - [x] `config.py` (global Plotly config + `apply_layout`, equal-axes enforcement)
     - [ ] `animation.py` (time-dependent scalar visualization)
-    - [ ] `utils.py` (common helpers)
   - `data/` sample SWC files (small, clearly licensed)
   - `notebooks/` examples for Jupyter (user-authored; do not auto-create notebooks)
   - `tests/` unit tests
